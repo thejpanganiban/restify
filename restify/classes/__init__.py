@@ -1,0 +1,1 @@
+from restify import RestifyObject
