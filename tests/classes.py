@@ -1,5 +1,6 @@
 from pymongo import Connection
 from restify.classes import RestifyObject
+from bson.objectid import ObjectId
 import unittest
 
 
@@ -55,7 +56,12 @@ class RestifyObjectTestCase(unittest.TestCase):
       objs.append(r)
     obj = RestifyObject.get_by_id(self.connection, self.database_name,
                                      self.collection_name, objs[0].id)
+    self.assertTrue(obj)
     self.assertEqual(obj.to_dict(), objs[0].to_dict())
+
+    obj = RestifyObject.get_by_id(self.connection, self.database_name,
+                                  self.collection_name, ObjectId())
+    self.assertFalse(obj)
 
 
 if __name__ == '__main__':
