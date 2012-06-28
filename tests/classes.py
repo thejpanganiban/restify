@@ -49,6 +49,7 @@ class RestifyObjectTestCase(unittest.TestCase):
     self.assertEqual(r.to_dict()['age'], self.fixture_data['age'])
 
   def test_get_by_id(self):
+    """Test get_by_id method."""
     objs = []
     for fixture_data in self.plenty_fixture_data:
       r = RestifyObject.create(self.connection, self.database_name,
