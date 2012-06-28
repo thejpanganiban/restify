@@ -59,7 +59,7 @@ class RestifyCollection(object):
 
   @classmethod
   def query(cls, connection, database_name, collection_name,
-            object_class=RestifyObject, *args, **kwargs):
+            object_class=RestifyObject, **kwargs):
     collection = connection[database_name][collection_name]
-    result = collection.find(*args, **kwargs)
+    result = collection.find(**kwargs)
     return cls(result, object_class)
