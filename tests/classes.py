@@ -63,6 +63,16 @@ class RestifyObjectTestCase(unittest.TestCase):
                                   self.collection_name, ObjectId())
     self.assertFalse(obj)
 
+  def test_delete(self):
+    """Test delete method."""
+    r = RestifyObject.create(self.connection, self.database_name,
+                             self.collection_name, self.fixture_data)
+    obj_id = r.id
+    r.delete(self.connection, self.database_name, self.collection_name)
+    deleted_obj = RestifyObject.get_by_id(self.connection, self.database_name,
+                                          self.collection_name, obj_id)
+    self.assertFalse(deleted_obj)
+
 
 if __name__ == '__main__':
   unittest.main()
