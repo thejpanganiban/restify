@@ -15,6 +15,13 @@ def index():
   return "Restify"
 
 
+@app.route('/classes')
+def api_classes():
+  return jsonify({
+      'result': db[db_name].collection_names()
+    })
+
+
 @app.route('/classes/<class_name>', methods=['GET', 'POST'])
 def api_collection(class_name):
 
