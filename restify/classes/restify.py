@@ -84,7 +84,7 @@ class RestifyCollection(object):
 
   def to_dict(self):
     return {
-          'result': [obj.to_dict for obj in self.result]
+          'result': [obj.to_dict() for obj in self.result]
         }
 
   @classmethod

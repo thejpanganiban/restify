@@ -11,5 +11,6 @@ setup(name="Restify",
       install_requires=[
           'flask >= 0.8, < 0.9',
           'pymongo >= 2.2, < 2.3',
+          'simplejson >= 2.6.0, < 2.7.0',
         ],
       )
