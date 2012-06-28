@@ -11,6 +11,51 @@ Requirements
 * flask
 * pymongo
 
+Usage
+-----
+
+Querying:
+
+    curl -X GET \
+         <host>/classes/<class_name>
+
+or
+
+    curl -X GET \
+         <host>/classes/<class_name>?where=<mongodb_query>
+
+example mongodb query
+
+    curl -X GET \
+         <host>/classes/<class_name>?where={'name': 'Jesse'}
+
+
+Creating objects:
+
+    curl -X POST \
+         -H "Content-Type: application/json" \
+         -d '{"name": "Jesse", "age": 21}' \
+         <host>/classes/<class_name>
+
+
+Updating objects:
+
+    curl -X PUT \
+         -H "Content-Type: application/json" \
+         -d '{"$set": {"name": "Jesse Panganiban"}}' \
+         <host>/classes/<class_name>/<object_id>
+
+
+Deleting objects:
+
+    curl -X DELETE \
+         <host>/classes/<class_name>/<object_id>
+
+
+See http://www.mongodb.org for queries and updating objects (modifiers).
+
+
+
 TODO
 ----
 
