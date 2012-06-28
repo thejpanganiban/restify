@@ -1,5 +1,5 @@
 from pymongo import Connection
-from restify.classes import RestifyObject
+from restify.classes import RestifyObject, RestifyCollection
 from bson.objectid import ObjectId
 import unittest
 
@@ -73,6 +73,47 @@ class RestifyObjectTestCase(unittest.TestCase):
     deleted_obj = RestifyObject.get_by_id(self.connection, self.database_name,
                                           self.collection_name, obj_id)
     self.assertFalse(deleted_obj)
+
+
+
+class RestifyCollectionTestCase(unittest.TestCase):
+
+  def setUp(self):
+    self.connection = Connection()
+    self.database_name = 'classtest'
+    self.collection_name = 'restifycollection'
+    self.plenty_fixture_data = [
+          {'name': "Jesse", 'age': 21},
+          {'name': "Mikko", 'age': 20},
+          {'name': "Jhelo", 'age': 21},
+        ]
+    self.plenty_fixture_objects = []
+    for fixture_data in self.plenty_fixture_data:
+      obj = RestifyObject.create(self.connection, self.database_name,
+                                 self.collection_name, fixture_data)
+      self.plenty_fixture_objects.append(obj)
+
+  def tearDown(self):
+    self.connection.drop_database(self.database_name)
+    self.connection = None
+
+  def test_query(self):
+    """Test query method."""
+    c = RestifyCollection.query(self.connection, self.database_name,
+                                self.collection_name)
+    self.assertTrue(c)
+
+  def test_to_dict(self):
+    """Test to_dict method."""
+    c = RestifyCollection.query(self.connection, self.database_name,
+                                self.collection_name)
+    self.assertTrue(c)
+    fixture_result_dict = {
+          'result': [obj.to_dict() for obj in self.plenty_fixture_objects]
+        }
+    self.assertTrue(c.to_dict(), fixture_result_dict)
+
+
 
 
 if __name__ == '__main__':

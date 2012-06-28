@@ -1,1 +1,1 @@
-from restify import RestifyObject
+from restify import RestifyObject, RestifyCollection

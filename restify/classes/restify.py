@@ -45,3 +45,21 @@ class RestifyObject(object):
     for attr in self.attrs:
       data[attr] = getattr(self, attr, '')
     return data
+
+
+class RestifyCollection(object):
+
+  def __init__(self, collection_data, object_class):
+    self.result = [object_class(data) for data in collection_data]
+
+  def to_dict(self):
+    return {
+          'result': [obj.to_dict for obj in self.result]
+        }
+
+  @classmethod
+  def query(cls, connection, database_name, collection_name,
+            object_class=RestifyObject, *args, **kwargs):
+    collection = connection[database_name][collection_name]
+    result = collection.find(*args, **kwargs)
+    return cls(result, object_class)
