@@ -103,6 +103,12 @@ class RestifyCollectionTestCase(unittest.TestCase):
                                 self.collection_name)
     self.assertTrue(c)
 
+    aq = RestifyCollection.query(self.connection, self.database_name,
+                                 self.collection_name, spec={'name': "Jesse"})
+    self.assertEqual(aq.result[0].age, 21)
+    self.assertEqual(aq.result[0].name, "Jesse")
+    self.assertEqual(len(aq.result), 1)
+
   def test_to_dict(self):
     """Test to_dict method."""
     c = RestifyCollection.query(self.connection, self.database_name,
