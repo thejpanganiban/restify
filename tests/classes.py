@@ -74,6 +74,29 @@ class RestifyObjectTestCase(unittest.TestCase):
                                           self.collection_name, obj_id)
     self.assertFalse(deleted_obj)
 
+  def test_update(self):
+    """Test update method."""
+    r = RestifyObject.create(self.connection, self.database_name,
+                             self.collection_name, self.fixture_data)
+    # To use $inc modifier
+    r.update(self.connection, self.database_name, self.collection_name,
+             {'$inc': { 'age': 1 }})
+    self.assertEqual(r.age, self.fixture_data['age'] + 1)
+
+    # To use $set modifier (possible conflict with updatedAt)
+    new_name = 'new Jesse'
+    r.update(self.connection, self.database_name, self.collection_name,
+             {'$set': {'name': new_name}})
+    self.assertEqual(r.name, new_name)
+    self.assertTrue(r.updatedAt)
+
+    # and again just for the kicks
+    new_name = 'and Jesse'
+    r.update(self.connection, self.database_name, self.collection_name,
+             {'$set': {'name': new_name}})
+    self.assertEqual(r.name, new_name)
+    self.assertTrue(r.updatedAt)
+
 
 
 class RestifyCollectionTestCase(unittest.TestCase):
@@ -118,8 +141,6 @@ class RestifyCollectionTestCase(unittest.TestCase):
           'result': [obj.to_dict() for obj in self.plenty_fixture_objects]
         }
     self.assertTrue(c.to_dict(), fixture_result_dict)
-
-
 
 
 if __name__ == '__main__':

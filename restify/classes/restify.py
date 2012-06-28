@@ -22,6 +22,7 @@ class RestifyObject(object):
   def create(cls, connection, database_name, collection_name, data):
     collection = connection[database_name][collection_name]
     data['createdAt'] = datetime.datetime.utcnow().isoformat()
+    data['updatedAt'] = ''
     obj_id = collection.insert(data)
     obj = collection.find_one({'_id': obj_id})
     return cls(obj)
@@ -39,6 +40,24 @@ class RestifyObject(object):
     collection = connection[database_name][collection_name]
     collection.remove(ObjectId(self.id))
     return None
+
+  def update(self, connection, database_name, collection_name, update_data, **kwargs):
+    collection = connection[database_name][collection_name]
+    # FIXME: Perhaps a better solution can be made.
+    # We now add an updatedAt attribute to the object.
+    if update_data.get('$set'):
+      # If update data uses set modifier, we merge the updatedAt with
+      # the passed update_data $set modifier.
+      set_modifier = update_data.get('$set').items()
+      set_modifier.append(tuple(['updatedAt', 
+                                 datetime.datetime.utcnow().isoformat()]))
+      update_data['$set'] = dict(set_modifier)
+    else:
+      update_data['$set'] = {'updatedAt': datetime.datetime.utcnow().isoformat()}
+    collection.update({'_id': ObjectId(self.id)}, update_data, **kwargs)
+    new_obj = collection.find_one({'_id': ObjectId(self.id)})
+    self._set_attrs(new_obj)
+    return self
 
   def to_dict(self):
     data = {}
