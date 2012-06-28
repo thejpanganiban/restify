@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, abort
 from pymongo import Connection
 from restify.classes import RestifyObject, RestifyCollection
 from werkzeug import exceptions
@@ -40,10 +40,33 @@ def api_collection(class_name):
     obj = RestifyObject.create(db, db_name, class_name, request.json)
     return jsonify(obj.to_dict())
 
+  else:
+    return abort(405)
 
-@app.route('/classes/<class_name>/<object_id>', methods=['GET', 'PUT', 'PUT'])
+
+@app.route('/classes/<class_name>/<object_id>', methods=['GET', 'PUT', 'DELETE'])
 def api_object(class_name, object_id):
-  pass
+
+  obj = RestifyObject.get_by_id(db, db_name, class_name, object_id)
+
+  if obj:
+
+    if request.method == 'GET':
+      return jsonify(obj.to_dict())
+
+    elif request.method == 'PUT':
+      obj.update(request.json)
+      return jsonify(obj.to_dict())
+
+    elif request.method == 'DELETE':
+      obj.delete()
+      return ''
+
+    else:
+      return abort(405)
+
+  else:
+    return abort(404)
 
 
 def debug():
