@@ -69,7 +69,7 @@ class RestifyObjectTestCase(unittest.TestCase):
     r = RestifyObject.create(self.connection, self.database_name,
                              self.collection_name, self.fixture_data)
     obj_id = r.id
-    r.delete(self.connection, self.database_name, self.collection_name)
+    r.delete()
     deleted_obj = RestifyObject.get_by_id(self.connection, self.database_name,
                                           self.collection_name, obj_id)
     self.assertFalse(deleted_obj)
@@ -79,21 +79,18 @@ class RestifyObjectTestCase(unittest.TestCase):
     r = RestifyObject.create(self.connection, self.database_name,
                              self.collection_name, self.fixture_data)
     # To use $inc modifier
-    r.update(self.connection, self.database_name, self.collection_name,
-             {'$inc': { 'age': 1 }})
+    r.update({'$inc': { 'age': 1 }})
     self.assertEqual(r.age, self.fixture_data['age'] + 1)
 
     # To use $set modifier (possible conflict with updatedAt)
     new_name = 'new Jesse'
-    r.update(self.connection, self.database_name, self.collection_name,
-             {'$set': {'name': new_name}})
+    r.update({'$set': {'name': new_name}})
     self.assertEqual(r.name, new_name)
     self.assertTrue(r.updatedAt)
 
     # and again just for the kicks
     new_name = 'and Jesse'
-    r.update(self.connection, self.database_name, self.collection_name,
-             {'$set': {'name': new_name}})
+    r.update({'$set': {'name': new_name}})
     self.assertEqual(r.name, new_name)
     self.assertTrue(r.updatedAt)
 

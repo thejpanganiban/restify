@@ -7,7 +7,10 @@ class RestifyObject(object):
   id = None
   attrs = ['id']
 
-  def __init__(self, pymongo_object):
+  def __init__(self, pymongo_object, connection=None, database_name=None, collection_name=None):
+    self.connection = connection
+    self.database_name = database_name
+    self.collection_name = collection_name
     self._set_attrs(pymongo_object)
 
   def _set_attrs(self, pymongo_object):
@@ -18,6 +21,14 @@ class RestifyObject(object):
         setattr(self, key, value)
         self.attrs.append(key)
 
+  @property
+  def collection(self):
+    if self.connection and self.database_name and self.collection_name:
+      return self.connection[self.database_name][self.collection_name]
+    else:
+      raise Exception('You need to set the connection, database_name, and ' +
+        'collection_name in order for you to access the collection.')
+
   @classmethod
   def create(cls, connection, database_name, collection_name, data):
     collection = connection[database_name][collection_name]
@@ -25,24 +36,22 @@ class RestifyObject(object):
     data['updatedAt'] = ''
     obj_id = collection.insert(data)
     obj = collection.find_one({'_id': obj_id})
-    return cls(obj)
+    return cls(obj, connection, database_name, collection_name)
 
   @classmethod
   def get_by_id(cls, connection, database_name, collection_name, object_id):
     collection = connection[database_name][collection_name]
     obj = collection.find_one({'_id': ObjectId(object_id)})
     if obj:
-      return cls(obj)
+      return cls(obj, connection, database_name, collection_name)
     else:
       return None
 
-  def delete(self, connection, database_name, collection_name):
-    collection = connection[database_name][collection_name]
-    collection.remove(ObjectId(self.id))
+  def delete(self):
+    self.collection.remove(ObjectId(self.id))
     return None
 
-  def update(self, connection, database_name, collection_name, update_data, **kwargs):
-    collection = connection[database_name][collection_name]
+  def update(self, update_data, **kwargs):
     # FIXME: Perhaps a better solution can be made.
     # We now add an updatedAt attribute to the object.
     if update_data.get('$set'):
@@ -54,8 +63,8 @@ class RestifyObject(object):
       update_data['$set'] = dict(set_modifier)
     else:
       update_data['$set'] = {'updatedAt': datetime.datetime.utcnow().isoformat()}
-    collection.update({'_id': ObjectId(self.id)}, update_data, **kwargs)
-    new_obj = collection.find_one({'_id': ObjectId(self.id)})
+    self.collection.update({'_id': ObjectId(self.id)}, update_data, **kwargs)
+    new_obj = self.collection.find_one({'_id': ObjectId(self.id)})
     self._set_attrs(new_obj)
     return self
 
@@ -68,8 +77,10 @@ class RestifyObject(object):
 
 class RestifyCollection(object):
 
-  def __init__(self, collection_data, object_class):
-    self.result = [object_class(data) for data in collection_data]
+  def __init__(self, collection_data, object_class, connection=None,
+               database_name=None, collection_name=None):
+    self.result = [object_class(data, connection, database_name, collection_name)
+        for data in collection_data]
 
   def to_dict(self):
     return {
@@ -81,4 +92,4 @@ class RestifyCollection(object):
             object_class=RestifyObject, **kwargs):
     collection = connection[database_name][collection_name]
     result = collection.find(**kwargs)
-    return cls(result, object_class)
+    return cls(result, object_class, connection, database_name, collection_name)
