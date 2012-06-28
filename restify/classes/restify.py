@@ -36,4 +36,7 @@ class RestifyObject(object):
   def get_by_id(cls, connection, database_name, collection_name, object_id):
     collection = connection[database_name][collection_name]
     obj = collection.find_one({'_id': ObjectId(object_id)})
-    return cls(obj)
+    if obj:
+      return cls(obj)
+    else:
+      return None
