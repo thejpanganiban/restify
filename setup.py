@@ -1,9 +1,11 @@
+import restify
 from setuptools import setup, find_packages
 
 
 setup(name="Restify",
     description="A RESTful interface for Mongodb",
-    version='0.1',
+    version=restify.__version__,
+    author=restify.__author__,
     packages=find_packages(),
     entry_points={
         'console_scripts': ['restify.debug = restify.server:debug']
