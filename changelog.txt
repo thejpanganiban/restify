@@ -1,0 +1,13 @@
+July 3, 2012
+
+    - Added Engine interface
+    - Added MongodbEngine for mongodb
+    - Added MongodbObject which wraps individual mongo record
+    - Added incomplete RedisEngine for redis
+    - Fixed update method by specifying $set under the method rather than passing as part of data
+    - Added logging
+    - Added engine selection
+    - Updated setup.py
+
+    TODO:
+    - Fix tests :P
